@@ -9,7 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState } from 'react';
 
 export default function Page() {
-  const { messages, input, handleInputChange, handleSubmit, append } = useChat();
+  const { messages, input, handleInputChange, handleSubmit, append, isLoading } = useChat();
   const [quizStarted, setQuizStarted] = useState(false);
 
   const handleStartQuiz = (topic: string, questionCount: number) => {
@@ -63,6 +63,13 @@ export default function Page() {
                 </div>
               </div>
             ))}
+            {
+              isLoading && (
+              <div ref={el => el?.scrollIntoView({ behavior: 'smooth', block: 'start'})} />
+              // behaviour: smooth is used to scroll smoothly to the bottom of the chat window
+              // block: start is used to scroll to the top of the new message
+              )
+            }
           </ScrollArea>
           <form onSubmit={handleSubmit} className="flex gap-2">
             <Input
