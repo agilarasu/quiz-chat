@@ -1,8 +1,6 @@
 "use client"
 
-import { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { PartyPopper, ThumbsUp, Frown } from 'lucide-react'
 
@@ -12,7 +10,6 @@ interface QuizResultProps {
 }
 
 export default function QuizResult({ score, maxScore }: QuizResultProps) {
-  const [showResult, setShowResult] = useState(true)
   const percentage = (score / maxScore) * 100
 
   const getResultContent = () => {
