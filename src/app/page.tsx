@@ -13,12 +13,22 @@ export default function Page() {
   const { messages, input, handleInputChange, handleSubmit, append, isLoading } = useChat();
   const [quizStarted, setQuizStarted] = useState(false);
 
-  const handleStartQuiz = (topic: string, questionCount: number) => {
+  const handleStartQuiz = (topic: string, questionCount: number, file: any) => {
     setQuizStarted(true);
+    if (file) {
     append({
       role: 'user',
-      content: `Start a quiz about ${topic} with ${questionCount} questions.`
+      content: `Start a quiz on ${topic} with ${questionCount} questions. Please use the attached reference material.`,
+      data: {
+        file
+      }
     });
+    } else {
+      append({
+        role: 'user',
+        content: `Start a quiz on ${topic} with ${questionCount} questions.`
+      });
+    }
   };
 
   return (
