@@ -57,12 +57,12 @@ export default function Page() {
   };
 
   return (
-    <div className="flex flex-col h-screen max-w-3xl mx-auto p-4">
+    <div className="flex flex-col h-screen w-full max-w-3xl mx-auto p-2 sm:p-4">
       {!quizStarted ? (
         <QuizSettings onStart={handleStartQuiz} />
       ) : (
         <>
-          <ScrollArea className="flex-grow mb-4 p-4 border rounded-lg">
+          <ScrollArea className="flex-grow mb-4 p-2 sm:p-4 border rounded-lg">
             {messages.map(message => (
               <div key={message.id} className={`mb-4 ${message.role === 'user' ? 'text-right' : 'text-left'}`}>
                 <div className={`inline-block p-2 rounded-lg ${message.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>
@@ -108,22 +108,18 @@ export default function Page() {
                 </div>
               </div>
             ))}
-            {
-              isLoading && (
-                <div ref={el => el?.scrollIntoView({ behavior: 'smooth', block: 'start' })} />
-                // behaviour: smooth is used to scroll smoothly to the bottom of the chat window
-                // block: start is used to scroll to the top of the new message
-              )
-            }
+            {isLoading && (
+              <div ref={el => el?.scrollIntoView({ behavior: 'smooth', block: 'start' })} />
+            )}
           </ScrollArea>
-          <form onSubmit={handleSubmit} className="flex gap-2" id='chat-form'>
+          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2" id='chat-form'>
             <Input
               value={input}
               onChange={handleInputChange}
               placeholder="Type a message..."
               className="flex-grow"
             />
-            <Button type="submit">Send</Button>
+            <Button type="submit" className="w-full sm:w-auto">Send</Button>
           </form>
         </>
       )}
