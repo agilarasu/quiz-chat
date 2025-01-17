@@ -17,7 +17,21 @@ export const askMCQ = createTool({
     }
 });
 
+export const showResult = createTool({
+    description: 'Show the result at the end of the quiz',
+    parameters: z.object({
+        score: z.number().describe('The user\'s score'),
+        maxScore: z.number().describe('The maximum possible score'),
+    }),
+    execute: async function ({ score, maxScore }) {
+        return {
+            score,
+            maxScore,
+        }
+    }
+});
 
 export const tools = {
     askMCQ: askMCQ,
+    showResult: showResult,
 };

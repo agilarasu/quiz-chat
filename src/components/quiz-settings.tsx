@@ -9,6 +9,7 @@ interface QuizSettingsProps {
   onStart: (topic: string, questionCount: number) => void;
 }
 
+// this component eats a function as a prop and calls it when the start button is clicked
 export default function QuizSettings({ onStart }: QuizSettingsProps) {
   const [topic, setTopic] = useState('');
   const [questionCount, setQuestionCount] = useState<number>(5);

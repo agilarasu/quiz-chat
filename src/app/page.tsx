@@ -3,6 +3,7 @@
 import { useChat } from 'ai/react';
 import MCQ from '@/components/mcq';
 import QuizSettings from '@/components/quiz-settings';
+import Result from '@/components/result';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -33,33 +34,42 @@ export default function Page() {
                   {message.content}
                 </div>
                 <div>
-                  {message.toolInvocations?.map(toolInvocation => {
+                    {message.toolInvocations?.map(toolInvocation => {
                     const { toolName, toolCallId, state } = toolInvocation;
-                    if (state === 'result' && toolName === 'askMCQ') {
+                    if (state === 'result') {
+                      if (toolName === 'askMCQ') {
                       const { result } = toolInvocation;
                       return (
                         <div key={toolCallId} className="mt-2">
-                          <MCQ 
-                            question={result.question} 
-                            options={result.options}
-                            hint={result.hint}
-                            onAnswer={answer => {
-                              append({
-                                role: 'user',
-                                content: `My answer is : ${answer}`
-                              });
-                            }}
-                          /> 
+                        <MCQ 
+                          question={result.question} 
+                          options={result.options}
+                          hint={result.hint}
+                          onAnswer={answer => {
+                          append({
+                            role: 'user',
+                            content: `My answer is : ${answer}`
+                          });
+                          }}
+                        /> 
                         </div>
                       );
-                    } else if (state !== 'result' && toolName === 'askMCQ') {
+                      } else if (toolName === 'showResult') {
+                      const { result } = toolInvocation;
                       return (
-                        <div key={toolCallId} className="mt-2 text-gray-500">
-                          Loading next question...
+                        <div key={toolCallId} className="mt-2">
+                        <Result score={result.score} maxScore={result.maxScore} />
                         </div>
+                      );
+                      }
+                    } else if (toolName === 'askMCQ') {
+                      return (
+                      <div key={toolCallId} className="mt-2 text-gray-500">
+                        Loading next question...
+                      </div>
                       );
                     }
-                  })}
+                    })}
                 </div>
               </div>
             ))}
