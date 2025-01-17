@@ -14,25 +14,17 @@ export default function QuizSettings({ onStart }: QuizSettingsProps) {
     const [questionCount, setQuestionCount] = useState<number>(5);
     const [file, setFile] = useState<any>(null);
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const selectedFile = e.target.files?.[0];
-        if (selectedFile) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                const base64 = reader.result as string;
-                setFile({
-                    name: selectedFile.name,
-                    type: selectedFile.type,
-                    content: base64.split(",")[1], // Strip the prefix
-                });
-            };
-            reader.readAsDataURL(selectedFile);
-        }
-    };
-
     const handleStart = () => {
         if (topic) {
             onStart(topic, questionCount, file);
+        }
+    };
+
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            // just send normal file object
+            setFile(e.target.files[0]);
         }
     };
 

@@ -10,25 +10,50 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState } from 'react';
 
 export default function Page() {
-  const { messages, input, handleInputChange, handleSubmit, append, isLoading } = useChat();
+  const { messages, setMessages, reload, input, handleInputChange, handleSubmit, append, isLoading } = useChat();
   const [quizStarted, setQuizStarted] = useState(false);
 
-  const handleStartQuiz = (topic: string, questionCount: number, file: any) => {
+
+  // Convert file to a Data URL
+  const convertToDataURL = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(new Error('File reading failed'));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleStartQuiz = async (topic: string, questionCount: number, file: any) => {
     setQuizStarted(true);
     if (file) {
-    append({
-      role: 'user',
-      content: `Start a quiz on ${topic} with ${questionCount} questions. Please use the attached reference material.`,
-      data: {
-        file
-      }
-    });
-    } else {
-      append({
-        role: 'user',
-        content: `Start a quiz on ${topic} with ${questionCount} questions.`
-      });
+
+      // Convert the file to a Data URL
+      const dataURL = await convertToDataURL(file);
+
+      // Create the attachment object
+      const attachment = {
+        name: file.name, // File name
+        contentType: file.type, // File MIME type
+        url: dataURL, // Base64-encoded Data URL
+      };
+
+      setMessages([
+        {
+          id: Date.now().toString(),
+          role: 'user',
+          content: `Start quiz on ${topic} with ${questionCount} questions. Refer the attachment for more context`,
+          experimental_attachments: [attachment]
+        },
+      ]);
     }
+    else {
+      setMessages([
+        { id: Date.now().toString(), role: 'user', content: `Start quiz on ${topic} with ${questionCount} questions` },
+      ]);
+    }
+    // The Saviour !!!
+    reload();
   };
 
   return (
@@ -44,54 +69,54 @@ export default function Page() {
                   {message.content}
                 </div>
                 <div>
-                    {message.toolInvocations?.map(toolInvocation => {
+                  {message.toolInvocations?.map(toolInvocation => {
                     const { toolName, toolCallId, state } = toolInvocation;
                     if (state === 'result') {
                       if (toolName === 'askMCQ') {
-                      const { result } = toolInvocation;
-                      return (
-                        <div key={toolCallId} className="mt-2">
-                        <MCQ 
-                          question={result.question} 
-                          options={result.options}
-                          hint={result.hint}
-                          onAnswer={answer => {
-                          append({
-                            role: 'user',
-                            content: `My answer is : ${answer}`
-                          });
-                          }}
-                        /> 
-                        </div>
-                      );
+                        const { result } = toolInvocation;
+                        return (
+                          <div key={toolCallId} className="mt-2">
+                            <MCQ
+                              question={result.question}
+                              options={result.options}
+                              hint={result.hint}
+                              onAnswer={answer => {
+                                append({
+                                  role: 'user',
+                                  content: `My answer is : ${answer}`
+                                });
+                              }}
+                            />
+                          </div>
+                        );
                       } else if (toolName === 'showResult') {
-                      const { result } = toolInvocation;
-                      return (
-                        <div key={toolCallId} className="mt-2">
-                        <Result score={result.score} maxScore={result.maxScore} />
-                        </div>
-                      );
+                        const { result } = toolInvocation;
+                        return (
+                          <div key={toolCallId} className="mt-2">
+                            <Result score={result.score} maxScore={result.maxScore} />
+                          </div>
+                        );
                       }
                     } else if (toolName === 'askMCQ') {
                       return (
-                      <div key={toolCallId} className="mt-2 text-gray-500">
-                        Loading next question...
-                      </div>
+                        <div key={toolCallId} className="mt-2 text-gray-500">
+                          Loading next question...
+                        </div>
                       );
                     }
-                    })}
+                  })}
                 </div>
               </div>
             ))}
             {
               isLoading && (
-              <div ref={el => el?.scrollIntoView({ behavior: 'smooth', block: 'start'})} />
-              // behaviour: smooth is used to scroll smoothly to the bottom of the chat window
-              // block: start is used to scroll to the top of the new message
+                <div ref={el => el?.scrollIntoView({ behavior: 'smooth', block: 'start' })} />
+                // behaviour: smooth is used to scroll smoothly to the bottom of the chat window
+                // block: start is used to scroll to the top of the new message
               )
             }
           </ScrollArea>
-          <form onSubmit={handleSubmit} className="flex gap-2">
+          <form onSubmit={handleSubmit} className="flex gap-2" id='chat-form'>
             <Input
               value={input}
               onChange={handleInputChange}
