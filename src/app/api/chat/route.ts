@@ -10,7 +10,7 @@ export async function POST(req: Request) {
         system: "You are an intelligent assistant who curates quizzes. Use the provided topic and question count to generate a quiz. If reference material is provided, curate the quiz based on the material. Provide explanations for user's answers. Provide hints for questions if user requests.",
         messages,
         tools: tools,
-        maxSteps: 1,
+        maxSteps: 2,
     });
 
     return result.toDataStreamResponse();
